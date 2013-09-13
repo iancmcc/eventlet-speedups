@@ -4,7 +4,7 @@ import os
 
 version = '0.9.17'
 
-long_description = (open('README.txt').read())
+long_description = open('README.rst').read()
 
 
 def extensions():

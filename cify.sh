@@ -23,8 +23,8 @@ git_tag () {
         popd 2>&1 > /dev/null
     fi
     pushd ${EVENTLET_REPO} 2>&1 > /dev/null
-    git checkout ${EVENTLET_TAG} 2>&1 > /dev/null
     echo "Checking out tag ${EVENTLET_TAG}"
+    git checkout ${EVENTLET_TAG} 2>&1 > /dev/null
     popd 2>&1 > /dev/null
 }
 

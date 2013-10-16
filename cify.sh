@@ -8,25 +8,24 @@ EVENTLET_TAG=$1
 EVENTLET_REPO=/tmp/eventlet
 EVENTLET_SRC=${EVENTLET_REPO}/eventlet
 
-QUIET="2>&1 > /dev/null"
 
 git_tag () {
     if [ ! -d ${EVENTLET_REPO}/.git ]; then
         echo "Checking out eventlet source"
-        git checkout ${EVENTLET_URL} ${EVENTLET_REPO} ${QUIET}
+        git checkout ${EVENTLET_URL} ${EVENTLET_REPO} 2>&1 > /dev/null
     else
         echo "Updating eventlet source"
-        pushd ${EVENTLET_REPO} ${QUIET}
-        git reset --hard ${QUIET}
-        git checkout master ${QUIET}
-        git pull ${QUIET}
-        git checkout ${EVENTLET_TAG} ${QUIET}
-        popd ${QUIET}
+        pushd ${EVENTLET_REPO} 2>&1 > /dev/null
+        git reset --hard 2>&1 > /dev/null
+        git checkout master 2>&1 > /dev/null
+        git pull 2>&1 > /dev/null
+        git checkout ${EVENTLET_TAG} 2>&1 > /dev/null
+        popd 2>&1 > /dev/null
     fi
-    pushd ${EVENTLET_REPO} ${QUIET}
-    git checkout ${EVENTLET_TAG} ${QUIET}
+    pushd ${EVENTLET_REPO} 2>&1 > /dev/null
+    git checkout ${EVENTLET_TAG} 2>&1 > /dev/null
     echo "Checking out tag ${EVENTLET_TAG}"
-    popd ${QUIET}
+    popd 2>&1 > /dev/null
 }
 
 cleanup_local () {
@@ -51,7 +50,7 @@ generate_c () {
 
 create_tag () {
     git commit -am "Generated C versions of ${EVENTLET_TAG}"
-    git tag -d ${EVENTLET_TAG} ${QUIET}
+    git tag -d ${EVENTLET_TAG} 2>&1 > /dev/null
     git tag ${EVENTLET_TAG}
 }
 

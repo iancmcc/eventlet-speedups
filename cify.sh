@@ -1,13 +1,62 @@
 #!/usr/bin/env bash
 
-EVENTLET=$1/eventlet
+
 HERE=$(dirname $0)
+SPEEDUP_SRC=${HERE}/src/eventlet/speedups
+EVENTLET_URL="https://github.com/eventlet/eventlet.git"
+EVENTLET_TAG=$1
+EVENTLET_REPO=/tmp/eventlet
+EVENTLET_SRC=${EVENTLET_REPO}/eventlet
 
+QUIET="2>&1 > /dev/null"
 
-for f in greenio semaphore queue timeout hubs/hub hubs/poll hubs/timer; do
-    cython ${EVENTLET}/${f}.py -o ${HERE}/src/eventlet/speedups/${f}.c
-done
-HUBINIT=${EVENTLET}/hubs/__init__.py 
-cp ${HUBINIT} ${EVENTLET}/hubs/trampoline.py
-cython ${EVENTLET}/hubs/trampoline.py -o ${HERE}/src/eventlet/speedups/hubs/trampoline.c
-rm -f ${EVENTLET}/hubs/trampoline.py
+git_tag () {
+    if [ ! -d ${EVENTLET_REPO}/.git ]; then
+        echo "Checking out eventlet source"
+        git checkout ${EVENTLET_URL} ${EVENTLET_REPO} ${QUIET}
+    else
+        echo "Updating eventlet source"
+        pushd ${EVENTLET_REPO} ${QUIET}
+        git reset --hard ${QUIET}
+        git checkout master ${QUIET}
+        git pull ${QUIET}
+        git checkout ${EVENTLET_TAG} ${QUIET}
+        popd ${QUIET}
+    fi
+    pushd ${EVENTLET_REPO} ${QUIET}
+    git checkout ${EVENTLET_TAG} ${QUIET}
+    echo "Checking out tag ${EVENTLET_TAG}"
+    popd ${QUIET}
+}
+
+cleanup_local () {
+    echo "Cleaning up local files"
+    find ${HERE} -name '*.c' -exec rm -rf {} \;
+}
+
+generate_c () {
+    cd ${HERE}
+    for f in greenio semaphore queue timeout hubs/hub hubs/poll hubs/timer; do
+        FNAME=${SPEEDUP_SRC}/${f}.c
+        cython ${EVENTLET_SRC}/${f}.py -o ${FNAME}
+        git add ${FNAME}
+    done
+    
+    TRAMPOLINE=${EVENTLET_SRC}/hubs/trampoline.py
+    cp ${EVENTLET_SRC}/hubs/__init__.py ${TRAMPOLINE}
+    cython ${TRAMPOLINE} -o ${SPEEDUP_SRC}/hubs/trampoline.c
+    git add ${SPEEDUP_SRC}/hubs/trampoline.c
+    rm -f ${TRAMPOLINE}
+}
+
+create_tag () {
+    git commit -am "Generated C versions of ${EVENTLET_TAG}"
+    git tag -d ${EVENTLET_TAG} ${QUIET}
+    git tag ${EVENTLET_TAG}
+}
+
+cleanup_local
+git_tag
+generate_c
+create_tag
+

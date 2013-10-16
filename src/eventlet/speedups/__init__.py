@@ -21,10 +21,11 @@ def _modules_to_patch():
     from eventlet.speedups.hubs import timer
     yield ('eventlet.hubs.hub', hub)
 
-    #poll = eventlet.import_patched('eventlet.speedups.hubs.poll')
+    #from eventlet.speedups.hubs import poll
     #yield ('eventlet.hubs.poll', poll)
 
     from eventlet.speedups.hubs import trampoline
+    yield ('eventlet.hubs._threadlocal', trampoline._threadlocal)
     yield ('eventlet.hubs.use_hub', trampoline.use_hub)
     yield ('eventlet.hubs.get_hub', trampoline.get_hub)
     yield ('eventlet.hubs.get_default_hub', trampoline.get_default_hub)

@@ -51,7 +51,7 @@ generate_c () {
 create_tag () {
     git commit -am "Generated C versions of ${EVENTLET_TAG}"
     git tag -d ${EVENTLET_TAG} 2>&1 > /dev/null
-    git tag ${EVENTLET_TAG}
+    #git tag ${EVENTLET_TAG}
 }
 
 cleanup_local

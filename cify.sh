@@ -12,7 +12,7 @@ EVENTLET_SRC=${EVENTLET_REPO}/eventlet
 git_tag () {
     if [ ! -d ${EVENTLET_REPO}/.git ]; then
         echo "Checking out eventlet source"
-        git checkout ${EVENTLET_URL} ${EVENTLET_REPO} 2>&1 > /dev/null
+        git clone ${EVENTLET_URL} ${EVENTLET_REPO}
     else
         echo "Updating eventlet source"
         pushd ${EVENTLET_REPO} 2>&1 > /dev/null
@@ -23,8 +23,8 @@ git_tag () {
         popd 2>&1 > /dev/null
     fi
     pushd ${EVENTLET_REPO} 2>&1 > /dev/null
-    echo "Checking out tag ${EVENTLET_TAG}"
     git checkout ${EVENTLET_TAG} 2>&1 > /dev/null
+    echo "Checking out tag ${EVENTLET_TAG}"
     popd 2>&1 > /dev/null
 }
 
